@@ -53,7 +53,6 @@ public ResponseEntity<SessionDto>newSession(@RequestBody SessionDto sessionDto,H
 //get all Session
 	@GetMapping("/sessions")
 	public ResponseEntity<List<SessionDto>> allSessions(HttpServletRequest request) {
-		System.out.println("\r\r\r\r\r\r\r\r\r\r\r\r++++++++++");
 		List<SessionDto> availableSession = this.caregiveService.getAllSession(request);
 		
 		if (availableSession.isEmpty()) {
@@ -96,10 +95,11 @@ public ApiResponse deleteSession(@PathVariable Long sessionId,HttpServletRequest
 	
 }
 //this code for update session
-@PutMapping("/{sessionId}/caregivepost")
-public ResponseEntity<SessionDto>updateSession(@RequestBody SessionDto sessionDto,@PathVariable Long sessionId){
-	SessionDto updateSession=this.caregiveService.updateSession(sessionDto,sessionId);
-	return new ResponseEntity<SessionDto>(updateSession,HttpStatus.OK);
+@PutMapping("/caregivepost")
+public ResponseEntity<ApiResponse>updateSession(@RequestBody SessionDto sessionDto,HttpServletRequest request){
+	
+	this.caregiveService.updateSession(sessionDto,jwtUtils.getJWTFromRequest(request));
+	return new ResponseEntity<ApiResponse>(new ApiResponse("Session updated successfully", true), HttpStatus.CREATED);
 	
 }
 

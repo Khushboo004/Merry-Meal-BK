@@ -18,7 +18,7 @@ public interface CaregiveService {
 
 	void deleteSession(Long sessionId, HttpServletRequest request);
 
-	SessionDto updateSession(SessionDto sessionDto, Long sessionId);
+	SessionDto updateSession(SessionDto sessionDto, String token);
 
 
 

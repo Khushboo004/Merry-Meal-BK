@@ -21,6 +21,7 @@ import com.merry.meal.data.Meal;
 import com.merry.meal.data.Session;
 import com.merry.meal.data.User;
 import com.merry.meal.exceptions.ResourceNotFounException;
+import com.merry.meal.exceptions.ResourceNotFoundException;
 import com.merry.meal.payload.MealDto;
 import com.merry.meal.payload.SessionDto;
 import com.merry.meal.repo.AccountRepo;
@@ -169,15 +170,21 @@ public class CaregiveServiceImpl implements CaregiveService {
 
 	// only caregiver update his session
 	@Override
-	public SessionDto updateSession(SessionDto sessionDto, Long sessionId) {
+	public SessionDto updateSession(SessionDto sessionDto,  String token) {
+
+		String email = jwtUtils.getUserNameFromToken(token);
+		Account account = accountRepo.findByEmail(email)
+		.orElseThrow(() -> new ResourceNotFoundException("user", "credentials", email));
+		
+		this.sessionRepo.findById(sessionDto.getFundId())
+		.orElseThrow(() -> new ResourceNotFoundException("Session", "Session id", sessionDto.getFundId().toString()));
+		Session session = this.modelmapper.map(sessionDto, Session.class);
 
 		System.out.println("////////////////////Session ---------------Id---//////////////////////");
-		Session session = this.sessionRepo.findById(sessionId)
-				.orElseThrow(() -> new ResourceNotFounException("Session", "Session Id", sessionId));
-		System.out.println("////////////////////Session ---------------Id---//////////////////////");
 		session.setCareStatus(sessionDto.getStatus());
-		session.setDate(sessionDto.getSession());
+		session.setDate(sessionDto.getDate());
 		session.setSession(sessionDto.getSession());
+		session.setUser(account.getUser());
 		Session updateSession = sessionRepo.save(session);
 		return this.modelmapper.map(updateSession, SessionDto.class);
 	}
